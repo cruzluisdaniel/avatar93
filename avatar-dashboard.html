@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luis Daniel — Avatar Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sand:        #F5ECD7;
+  --sand-light:  #FBF5E8;
+  --sand-dark:   #E8D9BC;
+  --coral:       #D4614A;
+  --coral-light: #E8826E;
+  --coral-pale:  #FAEAE6;
+  --coral-deep:  #A8402C;
+  --amber:       #C98B2A;
+  --amber-light: #E5A840;
+  --amber-pale:  #FDF3DC;
+  --ocean:       #1C4A6E;
+  --ocean-light: #2A6294;
+  --ocean-pale:  #D4E8F5;
+  --ocean-mid:   #3A7BAD;
+  --mist:        #C8DDE8;
+  --mist-light:  #E8F3F8;
+  --mist-dark:   #9ABCCC;
+  --dusk:        #7B4F6E;
+  --dusk-light:  #A67A96;
+  --dusk-pale:   #F0E4EC;
+  --white:       #FDFAF4;
+  --text-dark:   #1E2832;
+  --text-mid:    #4A5560;
+  --text-light:  #7A8890;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'DM Sans', system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--sans);background:var(--sand);color:var(--text-dark);min-height:100vh;overflow-x:hidden}
+
+/* ── GATE PAGE ── */
+#gate-page{
+  min-height:100vh;background:var(--ocean);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;position:relative;overflow:hidden;
+}
+#gate-page::before{
+  content:'';position:absolute;top:-200px;left:-200px;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(42,98,148,0.5) 0%,transparent 70%);
+  animation:drift1 9s ease-in-out infinite alternate;
+}
+#gate-page::after{
+  content:'';position:absolute;bottom:-150px;right:-150px;
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(212,97,74,0.2) 0%,transparent 70%);
+  animation:drift2 11s ease-in-out infinite alternate;
+}
+@keyframes drift1{from{transform:translate(0,0)}to{transform:translate(40px,30px)}}
+@keyframes drift2{from{transform:translate(0,0)}to{transform:translate(-30px,-20px)}}
+
+.wave-bg{position:absolute;bottom:0;left:0;right:0;height:140px;overflow:hidden;z-index:1}
+.wave-bg svg{width:100%;height:100%}
+
+.gate-content{position:relative;z-index:10;width:100%;max-width:500px;text-align:center}
+.gate-eyebrow{font-size:10px;font-weight:500;color:var(--mist);text-transform:uppercase;letter-spacing:3px;margin-bottom:14px;opacity:.65}
+.gate-title{font-family:var(--serif);font-size:clamp(44px,9vw,68px);font-weight:300;color:var(--white);line-height:1.05;margin-bottom:8px;letter-spacing:-1.5px}
+.gate-subtitle{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--mist);margin-bottom:36px;opacity:.75}
+
+.preview-label{font-size:9px;font-weight:500;color:var(--mist);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;opacity:.55}
+.preview-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.preview-pill{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);color:var(--mist);font-size:11px;padding:6px 14px;border-radius:20px}
+
+.preview-teaser{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 20px;text-align:left;margin-bottom:24px}
+.preview-teaser-title{font-family:var(--serif);font-size:17px;color:var(--white);margin-bottom:6px}
+.preview-teaser-body{font-size:12px;color:var(--mist);line-height:1.65;opacity:.8}
+.blurred{filter:blur(6px);user-select:none;pointer-events:none;margin-top:8px}
+
+.pw-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:16px;padding:22px}
+.pw-label{font-size:11px;color:var(--mist);margin-bottom:12px;opacity:.75;letter-spacing:.3px}
+.pw-row{display:flex;gap:8px}
+.pw-input{flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:13px 16px;font-size:14px;color:var(--white);font-family:var(--sans);outline:none;transition:border-color .2s;letter-spacing:2px}
+.pw-input::placeholder{color:rgba(255,255,255,.3);letter-spacing:1px;font-size:12px}
+.pw-input:focus{border-color:rgba(212,97,74,.6)}
+.pw-btn{background:var(--coral);color:var(--white);border:none;border-radius:10px;padding:13px 22px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:background .2s;white-space:nowrap}
+.pw-btn:hover{background:var(--coral-light)}
+.pw-error{font-size:11px;color:#FF8B7A;margin-top:10px;display:none;text-align:center}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none}
+
+.site-header{background:var(--ocean);padding:36px 40px 30px;position:relative;overflow:hidden}
+.header-wave{position:absolute;bottom:0;left:0;right:0;height:50px;overflow:hidden;opacity:.12}
+.header-wave svg{width:200%;animation:waveMove 9s linear infinite}
+@keyframes waveMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.header-top{position:relative;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+.hd-eyebrow{font-size:10px;font-weight:500;color:var(--mist);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:8px;opacity:.65}
+.hd-name{font-family:var(--serif);font-size:clamp(30px,5vw,50px);font-weight:300;color:var(--white);letter-spacing:-1px;line-height:1.1}
+.lock-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);color:var(--mist);border-radius:20px;padding:7px 16px;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .2s;flex-shrink:0}
+.lock-btn:hover{background:rgba(255,255,255,.16);color:var(--white)}
+.birth-pills{position:relative;z-index:2;display:flex;gap:8px;flex-wrap:wrap}
+.birth-pill{background:rgba(255,255,255,.1);color:var(--mist);font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.12)}
+
+.nav-bar{background:var(--ocean-light);display:flex;overflow-x:auto;padding:0 20px;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.08)}
+.nav-bar::-webkit-scrollbar{display:none}
+.nav-tab{flex-shrink:0;font-size:11px;font-weight:500;padding:15px 22px;color:var(--mist);background:none;border:none;cursor:pointer;font-family:var(--sans);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;opacity:.65}
+.nav-tab:hover{opacity:1;color:var(--white)}
+.nav-tab.active{color:var(--amber-light);border-bottom-color:var(--amber-light);opacity:1}
+
+.main{max-width:1120px;margin:0 auto;padding:40px 28px 80px}
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.sec-title{font-family:var(--serif);font-size:clamp(26px,4vw,38px);font-weight:300;color:var(--text-dark);margin-bottom:8px;letter-spacing:-.5px;line-height:1.2}
+.sec-sub{font-size:13px;color:var(--text-light);margin-bottom:32px;line-height:1.7;max-width:620px}
+
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:20px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:900px){.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.g3,.g2,.g4{grid-template-columns:1fr}.main{padding:24px 16px 60px}.site-header{padding:24px 20px 20px}}
+
+.card{background:var(--white);border:1px solid var(--sand-dark);border-radius:16px;padding:24px}
+.card-ey{font-size:9px;font-weight:500;color:var(--text-light);text-transform:uppercase;letter-spacing:1.3px;margin-bottom:8px}
+.card-title{font-family:var(--serif);font-size:21px;font-weight:300;color:var(--text-dark);margin-bottom:10px;line-height:1.3}
+.card-body{font-size:13px;color:var(--text-mid);line-height:1.75}
+
+/* Planet cards */
+.pc{border-radius:18px;padding:26px}
+.pc.sun{background:var(--coral)}
+.pc.moon{background:var(--ocean)}
+.pc.rising{background:var(--dusk)}
+.p-ey{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.8px;color:rgba(255,255,255,.5);margin-bottom:6px}
+.p-icon{font-size:34px;display:block;margin-bottom:10px}
+.p-sign{font-family:var(--serif);font-size:30px;color:var(--white);font-weight:300;margin-bottom:12px;letter-spacing:-.5px}
+.p-meaning{font-size:12px;color:rgba(255,255,255,.77);line-height:1.7;margin-bottom:16px}
+.p-tags{display:flex;flex-wrap:wrap;gap:5px}
+.p-tag{font-size:9px;font-weight:500;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.18)}
+
+/* Archetype */
+.archetype{background:var(--mist-light);border:1px solid var(--mist);border-radius:18px;padding:30px;margin-bottom:20px;display:flex;align-items:flex-start;gap:24px}
+.arch-icon{font-size:52px;flex-shrink:0;line-height:1}
+.arch-ey{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;color:var(--ocean-mid);margin-bottom:8px}
+.arch-title{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--text-dark);margin-bottom:12px}
+.arch-body{font-size:13px;color:var(--text-mid);line-height:1.75}
+
+/* Qstats */
+.qstats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+@media(max-width:600px){.qstats{grid-template-columns:1fr 1fr}}
+.qstat{background:var(--white);border:1px solid var(--sand-dark);border-radius:14px;padding:18px;text-align:center}
+.qstat-val{font-family:var(--serif);font-size:26px;color:var(--ocean);margin-bottom:4px;font-weight:300}
+.qstat-lbl{font-size:9px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px}
+
+/* Strengths */
+.str-card{background:var(--white);border:1px solid var(--sand-dark);border-radius:16px;padding:22px}
+.str-num{font-family:var(--serif);font-size:52px;color:var(--sand-dark);line-height:1;margin-bottom:8px;font-weight:300}
+.str-title{font-size:14px;font-weight:500;color:var(--text-dark);margin-bottom:10px}
+.str-body{font-size:12px;color:var(--text-mid);line-height:1.75;margin-bottom:14px}
+.str-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-light);margin-bottom:5px}
+.str-track{height:4px;background:var(--sand-dark);border-radius:2px;overflow:hidden}
+.str-fill{height:100%;border-radius:2px}
+
+/* Bug cards */
+.bug-card{background:var(--white);border:1px solid var(--sand-dark);border-radius:16px;padding:22px}
+.bug-hdr{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.bug-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.bug-title{font-size:14px;font-weight:500;color:var(--text-dark)}
+.bug-body{font-size:12px;color:var(--text-mid);line-height:1.75;margin-bottom:14px}
+.bug-patch{background:var(--ocean-pale);border-radius:10px;padding:12px 14px}
+.bug-patch-lbl{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--ocean-mid);margin-bottom:4px}
+.bug-patch-text{font-size:11px;color:var(--ocean);line-height:1.65}
+
+/* Focus cards */
+.fc{border-radius:18px;padding:24px}
+.fc.money{background:var(--ocean)}
+.fc.love{background:var(--coral)}
+.fc.career{background:var(--amber)}
+.fc.family{background:var(--dusk)}
+.fc-ey{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.8px;color:rgba(255,255,255,.5);margin-bottom:8px}
+.fc-icon{font-size:30px;display:block;margin-bottom:10px}
+.fc-title{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--white);margin-bottom:14px;line-height:1.3}
+.fc-points{list-style:none}
+.fc-points li{font-size:12px;color:rgba(255,255,255,.82);line-height:1.65;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:flex-start;gap:8px}
+.fc-points li:last-child{border-bottom:none}
+.fc-points li::before{content:'→';color:rgba(255,255,255,.35);flex-shrink:0;margin-top:1px}
+.fc-theme{margin-top:14px;font-size:11px;color:rgba(255,255,255,.45);font-style:italic;line-height:1.6;border-top:1px solid rgba(255,255,255,.1);padding-top:12px}
+
+/* Truth, mission, cheat */
+.truth{background:var(--amber-pale);border:1px solid #E8CFA0;border-radius:16px;padding:24px 26px;margin-bottom:16px}
+.truth-ey{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:10px}
+.truth-text{font-family:var(--serif);font-size:clamp(16px,2.5vw,20px);color:var(--text-dark);line-height:1.5;font-style:italic;font-weight:300}
+
+.mission{background:var(--ocean);border-radius:18px;padding:30px;margin-top:8px}
+.mission-ey{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.8px;color:var(--mist);opacity:.6;margin-bottom:10px}
+.mission-title{font-family:var(--serif);font-size:clamp(20px,3.5vw,27px);font-weight:300;color:var(--white);margin-bottom:14px;line-height:1.3}
+.mission-body{font-size:13px;color:var(--mist);line-height:1.8;opacity:.88}
+
+.cheat{background:var(--coral);border-radius:18px;padding:28px 32px;margin-top:4px}
+.cheat-ey{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.8px;color:rgba(255,255,255,.5);margin-bottom:10px}
+.cheat-text{font-family:var(--serif);font-size:clamp(17px,3vw,23px);font-weight:300;color:var(--white);line-height:1.45;font-style:italic}
+
+.sep{height:1px;background:var(--sand-dark);margin:28px 0}
+.sub-lbl{font-size:10px;font-weight:500;color:var(--text-light);text-transform:uppercase;letter-spacing:1.3px;margin-bottom:14px}
+
+.site-footer{background:var(--ocean);text-align:center;padding:20px;font-size:11px;color:var(--mist);letter-spacing:.5px;opacity:.65}
+</style>
+</head>
+<body>
+
+<!-- ══ GATE PAGE ══ -->
+<div id="gate-page">
+  <div class="wave-bg">
+    <svg viewBox="0 0 1440 140" preserveAspectRatio="none" fill="none">
+      <path d="M0,70 C360,110 720,30 1080,70 C1260,90 1350,50 1440,70 L1440,140 L0,140 Z" fill="rgba(255,255,255,0.05)"/>
+      <path d="M0,100 C360,60 720,120 1080,100 C1260,88 1350,112 1440,100 L1440,140 L0,140 Z" fill="rgba(255,255,255,0.04)"/>
+    </svg>
+  </div>
+
+  <div class="gate-content">
+    <p class="gate-eyebrow">Personal Avatar Dashboard</p>
+    <h1 class="gate-title">Luis Daniel</h1>
+    <p class="gate-subtitle">A living map for this lifetime</p>
+
+    <p class="preview-label">Public profile</p>
+    <div class="preview-pills">
+      <span class="preview-pill">☀️ Pisces Sun</span>
+      <span class="preview-pill">🌙 Capricorn Moon</span>
+      <span class="preview-pill">⬆️ Virgo Rising</span>
+      <span class="preview-pill">📍 Los Angeles · March 4, 1993</span>
+    </div>
+
+    <div class="preview-teaser">
+      <p class="preview-teaser-title">The Bridge Builder</p>
+      <p class="preview-teaser-body">Born to stand at the intersection of systems and people, feeling and structure, the individual and the institution...</p>
+      <p class="preview-teaser-body blurred">Full chart analysis, strengths, shadow work, and life focus areas are protected. Enter the access code below to unlock the complete dashboard — including everything discussed about money, family, love, career, detachment practice, and what building the great and beautiful thing actually looks like.</p>
+    </div>
+
+    <div class="pw-box">
+      <p class="pw-label">Enter the access code to unlock the full dashboard</p>
+      <div class="pw-row">
+        <input type="password" class="pw-input" id="pw-input" placeholder="Enter code..." onkeydown="if(event.key==='Enter')checkPW()">
+        <button class="pw-btn" onclick="checkPW()">Unlock →</button>
+      </div>
+      <p class="pw-error" id="pw-error">That's not right. Try again.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="dashboard">
+
+  <div class="site-header">
+    <div class="header-wave">
+      <svg viewBox="0 0 2880 50" preserveAspectRatio="none" fill="none">
+        <path d="M0,25 C480,45 960,5 1440,25 C1920,45 2400,5 2880,25 L2880,50 L0,50 Z" fill="white"/>
+      </svg>
+    </div>
+    <div class="header-top">
+      <div>
+        <p class="hd-eyebrow">Personal Avatar Dashboard</p>
+        <h1 class="hd-name">Luis Daniel Cruz</h1>
+      </div>
+      <button class="lock-btn" onclick="logout()">← Lock</button>
+    </div>
+    <div class="birth-pills">
+      <span class="birth-pill">☀ March 4, 1993</span>
+      <span class="birth-pill">⏱ 5:02 PM</span>
+      <span class="birth-pill">📍 Los Angeles, CA</span>
+      <span class="birth-pill">♓ Pisces Sun</span>
+      <span class="birth-pill">♑ Capricorn Moon</span>
+      <span class="birth-pill">♍ Virgo Rising</span>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="nav-tab active" onclick="goScreen('avatar',this)">Core Avatar</button>
+    <button class="nav-tab" onclick="goScreen('strengths',this)">Strengths</button>
+    <button class="nav-tab" onclick="goScreen('shadow',this)">Shadow Work</button>
+    <button class="nav-tab" onclick="goScreen('life',this)">Life Focus</button>
+  </div>
+
+  <div class="main">
+
+    <!-- ══ AVATAR ══ -->
+    <div class="screen active" id="screen-avatar">
+      <h2 class="sec-title">Your core architecture</h2>
+      <p class="sec-sub">Three planetary placements that define your operating system — who you are at the core, how you process emotion, and how the world first experiences you.</p>
+
+      <div class="qstats">
+        <div class="qstat"><p class="qstat-val">♓</p><p class="qstat-lbl">Sun in Pisces</p></div>
+        <div class="qstat"><p class="qstat-val">♑</p><p class="qstat-lbl">Moon in Capricorn</p></div>
+        <div class="qstat"><p class="qstat-val">♍</p><p class="qstat-lbl">Virgo Rising</p></div>
+        <div class="qstat"><p class="qstat-val" style="font-size:18px">RPG</p><p class="qstat-lbl">Avatar Class</p></div>
+      </div>
+
+      <div class="g3">
+        <div class="pc sun">
+          <span class="p-icon">☀️</span>
+          <p class="p-ey">Sun · Core identity</p>
+          <p class="p-sign">Pisces</p>
+          <p class="p-meaning">Your main character class. Built for depth, not surface. Processing runs on feeling and pattern recognition below conscious logic. You often know things before you can explain why. High empathy stats, creativity, and an almost mystical ability to read rooms and people.</p>
+          <div class="p-tags"><span class="p-tag">Intuitive</span><span class="p-tag">Empathic</span><span class="p-tag">Visionary</span><span class="p-tag">Deep processor</span><span class="p-tag">Late bloomer</span></div>
+        </div>
+
+        <div class="pc moon">
+          <span class="p-icon">🌙</span>
+          <p class="p-ey">Moon · Emotional OS</p>
+          <p class="p-sign">Capricorn</p>
+          <p class="p-meaning">You process feelings by doing — building, achieving, proving. Sitting with raw emotion without converting it into action feels like a system error. You need to feel productive to feel emotionally okay. This creates both strength and a hidden vulnerability.</p>
+          <div class="p-tags"><span class="p-tag">Achievement-driven</span><span class="p-tag">Controlled</span><span class="p-tag">Disciplined</span><span class="p-tag">Long arc</span><span class="p-tag">Stoic</span></div>
+        </div>
+
+        <div class="pc rising">
+          <span class="p-icon">⬆️</span>
+          <p class="p-ey">Rising · User interface</p>
+          <p class="p-sign">Virgo</p>
+          <p class="p-meaning">What others see first: composed, observant, capable, detail-oriented. People trust you quickly because you project competence. The irony is the interior (Pisces) is far more oceanic than the exterior suggests. Most people never see the gap.</p>
+          <div class="p-tags"><span class="p-tag">Analytical</span><span class="p-tag">Precise</span><span class="p-tag">Reliable</span><span class="p-tag">Service-minded</span><span class="p-tag">Inner critic</span></div>
+        </div>
+      </div>
+
+      <div class="archetype">
+        <span class="arch-icon">🌊</span>
+        <div>
+          <p class="arch-ey">Your avatar archetype</p>
+          <p class="arch-title">The Bridge Builder</p>
+          <p class="arch-body">You were built to stand at the intersection — between people and systems, feeling and structure, the individual and the institution. Pisces gives you the vision and the empathy. Virgo rising gives you execution and precision. Capricorn moon gives you discipline and the long game. Most people have one of these. You have all three in tension — and that tension, harnessed, makes you genuinely rare in any room you walk into.</p>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+      <p class="sub-lbl">Additional placements</p>
+      <div class="g2">
+        <div class="card">
+          <p class="card-ey">Mercury in Aquarius</p>
+          <p class="card-title">Independent systems thinker</p>
+          <p class="card-body">Your thinking style is forward-looking, independent, and structural. You understand patterns and systemic problems before other people see them. Can seem detached when you're actually processing at a completely different altitude than the room.</p>
+        </div>
+        <div class="card">
+          <p class="card-ey">Venus in Aries</p>
+          <p class="card-title">Intensity in love</p>
+          <p class="card-body">You lead with directness and intensity in relationships. You're attracted to strong energy and need to feel alive — not just comfortable — in a partnership. The bug: Aries impatience can exit situations before they've had time to develop into something real.</p>
+        </div>
+      </div>
+
+      <div class="truth">
+        <p class="truth-ey">Core truth of this build</p>
+        <p class="truth-text">"The interior experience is oceanic. The exterior presentation is controlled. Most people never see the gap — and that gap is where both your deepest power and your greatest pain live."</p>
+      </div>
+
+      <div class="mission">
+        <p class="mission-ey">The mission of this lifetime</p>
+        <p class="mission-title">Learn to receive as fluidly as you give.</p>
+        <p class="mission-body">The program has exceptionally strong output functions — giving, building, helping, carrying. The growth edge of this entire lifetime is building equally strong input tolerance. For help. For rest. For love. For credit. For being seen without controlling the outcome. The avatar was built for impact. The question is whether you'll let yourself actually receive the life that impact creates.</p>
+      </div>
+    </div>
+
+    <!-- ══ STRENGTHS ══ -->
+    <div class="screen" id="screen-strengths">
+      <h2 class="sec-title">Strengths to play to</h2>
+      <p class="sec-sub">Your highest-stat abilities. The goal isn't to fix your weaknesses — it's to deploy these so consistently that the weaknesses become irrelevant background noise.</p>
+
+      <div class="g2">
+        <div class="str-card">
+          <p class="str-num">01</p>
+          <p class="str-title">Pattern recognition at depth</p>
+          <p class="str-body">Pisces + Virgo is a rare combination. You have both the intuitive feel of the big picture AND the analytical granularity to execute on it. Most people have one or the other. Use both together and you're genuinely difficult to compete with in any room at any table.</p>
+          <div class="str-bar-labels"><span>Natural strength level</span><span>97%</span></div>
+          <div class="str-track"><div class="str-fill" style="width:97%;background:var(--ocean)"></div></div>
+        </div>
+
+        <div class="str-card">
+          <p class="str-num">02</p>
+          <p class="str-title">Instant trustworthiness</p>
+          <p class="str-body">Virgo rising + Capricorn moon = someone who shows up, follows through, and doesn't dramatize. In any room you walk into, people instinctively hand you responsibility. This is a quiet leadership superpower — lean into it rather than deflecting out of habit.</p>
+          <div class="str-bar-labels"><span>Natural strength level</span><span>93%</span></div>
+          <div class="str-track"><div class="str-fill" style="width:93%;background:var(--ocean)"></div></div>
+        </div>
+
+        <div class="str-card">
+          <p class="str-num">03</p>
+          <p class="str-title">Deep environmental reading</p>
+          <p class="str-body">Your Pisces sun is a high-resolution scanner of whatever context you're in — other people's energy, subtext, the weight of unspoken things. Makes you exceptional at work requiring systems thinking with a human element. You understand what's actually happening, not just what's being said.</p>
+          <div class="str-bar-labels"><span>Natural strength level</span><span>94%</span></div>
+          <div class="str-track"><div class="str-fill" style="width:94%;background:var(--ocean)"></div></div>
+        </div>
+
+        <div class="str-card">
+          <p class="str-num">04</p>
+          <p class="str-title">Long arc compounding</p>
+          <p class="str-body">Pisces and Capricorn moon avatars are coded for long games. Your best chapters are written in your 30s and 40s as discipline, trust, and credibility compound on each other. The program is patient even when you aren't. Stop measuring yourself against a timeline designed for a different build.</p>
+          <div class="str-bar-labels"><span>Natural strength level</span><span>90%</span></div>
+          <div class="str-track"><div class="str-fill" style="width:90%;background:var(--ocean)"></div></div>
+        </div>
+
+        <div class="str-card">
+          <p class="str-num">05</p>
+          <p class="str-title">Magnetic when unguarded</p>
+          <p class="str-body">The Pisces sun has a quiet magnetism when it stops hiding. People are drawn to it because it feels human and real. Your greatest leadership asset isn't authority or traditional charisma — it's that people feel genuinely seen by you. That only works if you're actually visible yourself.</p>
+          <div class="str-bar-labels"><span>Deployed vs. potential — room to grow</span><span>55%</span></div>
+          <div class="str-track"><div class="str-fill" style="width:55%;background:var(--amber)"></div></div>
+        </div>
+
+        <div class="str-card">
+          <p class="str-num">06</p>
+          <p class="str-title">Translator between worlds</p>
+          <p class="str-body">You naturally translate between the emotional and the structural, the individual and the institutional, the visionary and the operational. This is the rarest skill in mission-driven work. Most people live on one side. You live in the gap between both — and that gap is where the most important work happens.</p>
+          <div class="str-bar-labels"><span>Natural strength level</span><span>92%</span></div>
+          <div class="str-track"><div class="str-fill" style="width:92%;background:var(--ocean)"></div></div>
+        </div>
+      </div>
+
+      <div class="cheat">
+        <p class="cheat-ey">The closest thing to a cheat code</p>
+        <p class="cheat-text">"Stop waiting until you're ready. The avatar develops by playing — not by preparing to play. The debt doesn't have to be gone. The body doesn't have to be perfect. The fear doesn't have to disappear. You start from exactly where you are, right now."</p>
+      </div>
+    </div>
+
+    <!-- ══ SHADOW WORK ══ -->
+    <div class="screen" id="screen-shadow">
+      <h2 class="sec-title">Bugs to patch</h2>
+      <p class="sec-sub">Not character flaws — predictable patterns baked into your specific chart combination. Naming them removes their power. Each comes with a concrete patch.</p>
+
+      <div class="g2">
+        <div class="bug-card">
+          <div class="bug-hdr"><div class="bug-icon" style="background:var(--coral-pale)">🚪</div><p class="bug-title">The escape hatch</p></div>
+          <p class="bug-body">Pisces' most persistent bug. When reality gets harsh the program defaults to dissolving — daydreaming, avoidance, over-idealism, losing yourself in someone else's world. The code will look for an exit. Notice when you're floating instead of swimming.</p>
+          <div class="bug-patch"><p class="bug-patch-lbl">The patch</p><p class="bug-patch-text">Name the escape when it happens. "I'm avoiding X right now." That one sentence interrupts the loop more reliably than willpower alone.</p></div>
+        </div>
+
+        <div class="bug-card">
+          <div class="bug-hdr"><div class="bug-icon" style="background:var(--ocean-pale)">🔋</div><p class="bug-title">Buffer overflow from over-giving</p></div>
+          <p class="bug-body">High empathy + Virgo desire to fix + Capricorn need to prove usefulness = chronically over-giving and under-receiving. You'll run resource deficits for long stretches before the system crashes — usually through illness. The body keeps the score.</p>
+          <div class="bug-patch"><p class="bug-patch-lbl">The patch</p><p class="bug-patch-text">Build recovery proactively, not reactively. One full unscheduled day per week. Treat it like a meeting with your most important stakeholder — because it is.</p></div>
+        </div>
+
+        <div class="bug-card">
+          <div class="bug-hdr"><div class="bug-icon" style="background:var(--amber-pale)">🔊</div><p class="bug-title">The unreasonable inner critic</p></div>
+          <p class="bug-body">Virgo rising + Capricorn moon creates a brutal internal evaluator. You hold yourself to a standard you'd never apply to anyone else. The program mistakes self-criticism for quality control. It isn't — it's just drag on performance, creativity, and joy.</p>
+          <div class="bug-patch"><p class="bug-patch-lbl">The patch</p><p class="bug-patch-text">Ask: "Would I say this to someone I love?" If not, the critic isn't calibrated — it's noise. Redirect: "What would I tell a brilliant friend in this exact situation?"</p></div>
+        </div>
+
+        <div class="bug-card">
+          <div class="bug-hdr"><div class="bug-icon" style="background:var(--coral-pale)">🔒</div><p class="bug-title">The emotional vault</p></div>
+          <p class="bug-body">Capricorn moon makes vulnerability feel structurally unsafe. You convert feelings into tasks, or go quiet when you actually need connection. People close to you feel shut out without understanding why. This one doesn't self-correct — it requires a deliberate patch.</p>
+          <div class="bug-patch"><p class="bug-patch-lbl">The patch</p><p class="bug-patch-text">Practice selective visibility. Let people see the unpolished version in safe contexts. Start small. Stack experiences of the world not ending. The nervous system updates its model over time.</p></div>
+        </div>
+
+        <div class="bug-card">
+          <div class="bug-hdr"><div class="bug-icon" style="background:var(--ocean-pale)">📊</div><p class="bug-title">Outcome attachment in disguise</p></div>
+          <p class="bug-body">You over-give because you need the outcome to validate the effort. You hold back from being seen because you can't control how it lands. You delay financial moves because outcomes feel tied to your worthiness. All of this is attachment running quietly in the background.</p>
+          <div class="bug-patch"><p class="bug-patch-lbl">The patch</p><p class="bug-patch-text">After completing anything — send the email, make the decision, have the conversation — consciously put it down. "That's done. I'm releasing the outcome." Practice daily.</p></div>
+        </div>
+
+        <div class="bug-card">
+          <div class="bug-hdr"><div class="bug-icon" style="background:var(--amber-pale)">⏱</div><p class="bug-title">Waiting until ready</p></div>
+          <p class="bug-body">Capricorn moon wants to show up with credentials. You wait until you're sorted, successful, or healed enough before stepping into leadership, visibility, or full commitment. The readiness condition never fully arrives — because it's powered by fear, not facts.</p>
+          <div class="bug-patch"><p class="bug-patch-lbl">The patch</p><p class="bug-patch-text">Ask: "What's the smallest version of this I could do today, imperfectly?" Do that. The doing creates readiness — not the other way around.</p></div>
+        </div>
+      </div>
+
+      <div class="truth">
+        <p class="truth-ey">The root of most bugs</p>
+        <p class="truth-text">"Worthiness. The belief that you deserve abundance and deep connection without first earning it through suffering. That's the single unlock that changes every bug on this page simultaneously."</p>
+      </div>
+    </div>
+
+    <!-- ══ LIFE FOCUS ══ -->
+    <div class="screen" id="screen-life">
+      <h2 class="sec-title">Life focus areas</h2>
+      <p class="sec-sub">What the chart says about the four domains that matter most — and what your specific build needs to thrive in each one. These are orientations, not goals.</p>
+
+      <div class="g2">
+        <div class="fc money">
+          <span class="fc-icon">💰</span>
+          <p class="fc-ey">Money</p>
+          <p class="fc-title">Build equity in something. Stop underpricing yourself.</p>
+          <ul class="fc-points">
+            <li>You're not built to chase money directly — but you create value at scale. Money follows when you stop underselling.</li>
+            <li>Your income ceiling is tied to your visibility ceiling. Raising one raises the other — they're the same unlock.</li>
+            <li>Wealth looks like equity, not just salary. Ownership, stake, authorship, property. Something that compounds over time.</li>
+            <li>Get brutally clear on the total debt number. Look at it fully. Most people avoid it because it feels like looking at the sun.</li>
+            <li>Mission-aligned work can pay very well. The false binary — meaning vs. compensation — is a story your build accepts too easily.</li>
+          </ul>
+          <p class="fc-theme">You were not built for scarcity. You were built for abundance — but you have to stop treating yourself like a placeholder in your own life.</p>
+        </div>
+
+        <div class="fc love">
+          <span class="fc-icon">🌊</span>
+          <p class="fc-ey">Love + Relationship</p>
+          <p class="fc-title">Let the partnership be real. Stop carrying it alone.</p>
+          <ul class="fc-points">
+            <li>You are deeply coded for partnership. This is not a lone wolf build despite how self-sufficient it appears on the surface.</li>
+            <li>The pattern to watch: giving 90% and calling it balanced. Receiving is a skill — practice it deliberately, not just when depleted.</li>
+            <li>Let your partner in on the real inventory — the debt, the longing, the ambition, the fear. That's partnership, not burden.</li>
+            <li>Venus in Aries falls fast. Build compatibility over time, not just intensity at the start. Intensity is data, not destiny.</li>
+            <li>Receive stability as a gift. Stop internally treating it as a debt you owe or a standard you haven't met yet.</li>
+          </ul>
+          <p class="fc-theme">A real partner is a mirror and a home base. You perform at your best when you have somewhere genuinely safe to decompress.</p>
+        </div>
+
+        <div class="fc career">
+          <span class="fc-icon">🏗️</span>
+          <p class="fc-ey">Career + Purpose</p>
+          <p class="fc-title">Stop being behind the scenes. Step into the frame.</p>
+          <ul class="fc-points">
+            <li>You're good at the work. The missing piece is calling it like you see it — with colleagues, systems, and people in power.</li>
+            <li>Your mix of depth, empathy, lived experience in housing and community development is a rare and valuable combination.</li>
+            <li>Move toward roles with more strategic influence. You may be under-deployed at implementation when you should be shaping vision.</li>
+            <li>Work at the intersection of systems and people — that's where your avatar performs at maximum stats.</li>
+            <li>The shame isn't a stop sign. It's unprocessed data from earlier levels. You don't have to be done processing it to start moving forward.</li>
+          </ul>
+          <p class="fc-theme">The program didn't give you this depth and perception to manage spreadsheets and stay safe. That's a waste of a rare build.</p>
+        </div>
+
+        <div class="fc family">
+          <span class="fc-icon">🌱</span>
+          <p class="fc-ey">Family + Roots</p>
+          <p class="fc-title">Don't minimize the longing. It's costing you energy daily.</p>
+          <ul class="fc-points">
+            <li>Pisces sun without its roots runs at a deficit. The distance from LA costs you more than you let yourself acknowledge.</li>
+            <li>Make visits more frequent and intentional — even if shorter. Quality of connection over duration.</li>
+            <li>Build chosen family in SF deliberately. Your build needs people nearby who know the real version of you.</li>
+            <li>Be honest with yourself about whether SF is a forever home or a chapter. That question deserves real airtime, not background anxiety.</li>
+            <li>Your avatar is a profound parent archetype — the empathy, depth, and quiet protectiveness. That chapter is available when you're ready.</li>
+          </ul>
+          <p class="fc-theme">Home is not a location you haven't found yet. It's a state you build deliberately — and roots are what make everything else possible.</p>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+      <p class="sub-lbl">The thread connecting all four</p>
+
+      <div class="truth">
+        <p class="truth-ey">The underlying pattern</p>
+        <p class="truth-text">"Money, love, career, and family are all running on the same root code: worthiness. The belief that you deserve abundance and connection without first earning it through suffering. That's the single unlock that shifts all four simultaneously."</p>
+      </div>
+
+      <div class="mission">
+        <p class="mission-ey">What building the great and beautiful thing actually looks like</p>
+        <p class="mission-title">Not all at once. Step by step, from exactly where you are today.</p>
+        <p class="mission-body">Stabilize the foundation — debt, body, sleep. Show up more fully at work — use your actual voice. Let the relationship be a real partnership. Stay connected to family and to your roots. Create space in the schedule to think and design, not just execute. Let yourself be seen — imperfect, in process, real. The great and beautiful thing gets built by doing those six things consistently. Not by waiting until conditions are perfect. The avatar starts now — from right here.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="site-footer">
+    Luis Daniel Cruz · Born March 4, 1993 · Los Angeles, CA · ☀ Pisces · 🌙 Capricorn · ⬆ Virgo Rising
+  </div>
+
+</div>
+
+<script>
+const PW = 'Funfun21';
+
+function checkPW() {
+  const val = document.getElementById('pw-input').value;
+  const err = document.getElementById('pw-error');
+  if (val === PW) {
+    document.getElementById('gate-page').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    window.scrollTo(0, 0);
+  } else {
+    err.style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').style.borderColor = 'rgba(212,97,74,0.7)';
+    setTimeout(() => {
+      err.style.display = 'none';
+      document.getElementById('pw-input').style.borderColor = 'rgba(255,255,255,0.18)';
+    }, 2500);
+  }
+}
+
+function logout() {
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('gate-page').style.display = 'flex';
+  document.getElementById('pw-input').value = '';
+  window.scrollTo(0, 0);
+}
+
+function goScreen(name, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
